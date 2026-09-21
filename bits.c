@@ -19,7 +19,7 @@
  * Difficulty: 1
  */
 int bitAnd(int x, int y) {
-    return 2;
+    return ~(~x | ~y);
 }
 
 /*
@@ -30,7 +30,7 @@ int bitAnd(int x, int y) {
  *   Difficulty: 1
  */
 int bitXor(int x, int y) {
-    return 2;
+    return ~(x & y) & ~(~x & ~y);
 }
 
 /*
@@ -50,7 +50,13 @@ int bitXor(int x, int y) {
  *   1 if x and y have the same sign , 0 otherwise.
  */
 int samesign(int x, int y) {
-    return 2;
+    if (!x) {
+        return !y;
+    }
+    if (!y) {
+        return 0;
+    }
+    return !((x ^ y) >> 31);
 }
 
 /*
@@ -63,7 +69,17 @@ int samesign(int x, int y) {
  *   Difficulty: 4
  */
 int logtwo(int v) {
-    return 2;
+    int step1 = ((v >> 16) > 0) << 4;
+    v=v>>step1;
+    int step2 = ((v >> 8) > 0) << 3;
+    v=v>>step2;
+    int step3 = ((v >> 4) > 0) << 2;
+    v=v>>step3;
+    int step4 = ((v >> 2) > 0) << 1;
+    v=v>>step4;
+    int step5 = ((v >> 1) > 0) << 0;
+    v=v>>step5;
+    return step1 | step2 | step3 | step4 | step5;
 }
 
 /*
@@ -76,7 +92,16 @@ int logtwo(int v) {
  *    Difficulty: 2
  */
 int byteSwap(int x, int n, int m) {
-    return 2;
+    int shiftN = n << 3;
+    int shiftM = m << 3;
+
+    int byteN = (x >> shiftN) & 0xFF;
+    int byteM = (x >> shiftM) & 0xFF;
+
+    int mask = (0xFF << shiftN) | (0xFF << shiftM);
+    int cleared = x & ~mask;
+
+    return cleared | (byteN << shiftM) | (byteM << shiftN);
 }
 
 /*
@@ -88,7 +113,16 @@ int byteSwap(int x, int n, int m) {
  *   Difficulty: 3
  */
 unsigned reverse(unsigned v) {
-    return 2;
+    unsigned ans = 0;
+    int count = 32;
+
+    while (count) {
+        ans = (ans << 1) | (v & 1);
+        v = v >> 1;
+        count = count - 1;
+    }
+
+    return ans;
 }
 
 /*
@@ -100,7 +134,9 @@ unsigned reverse(unsigned v) {
  *   Difficulty: 3
  */
 int logicalShift(int x, int n) {
-    return 2;
+    int ans = x >> n;
+    int mask = 0xFFFFFFFF >> n;
+    return ans & mask;
 }
 
 /*
@@ -112,7 +148,25 @@ int logicalShift(int x, int n) {
  *   Difficulty: 4
  */
 int leftBitCount(int x) {
-    return 2;
+    int count = (!((x >> 16) ^ ~0)) << 4;
+
+    int shift = 24 + ~count + 1;
+    int step8 = !((x >> shift) ^ ~0);
+    count = count + (step8 << 3);
+
+    shift = 28 + ~count + 1;
+    int step4 = !((x >> shift) ^ ~0);
+    count = count + (step4 << 2);
+
+    shift = 30 + ~count + 1;
+    int step2 = !((x >> shift) ^ ~0);
+    count = count + (step2 << 1);
+
+    shift = 31 + ~count + 1;
+    int step1 = !((x >> shift) ^ ~0);
+    count = count + step1;
+
+    return count + !(x ^ ~0);
 }
 
 /*
